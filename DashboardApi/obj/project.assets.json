@@ -871,24 +871,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\maksn\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\Lenov\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\maksn\\Desktop\\DashboardForManager\\DashboardApi\\DashboardApi.csproj",
+      "projectUniqueName": "G:\\WORK\\CURS\\Стажеры\\dash2\\DashboardApi\\DashboardApi.csproj",
       "projectName": "DashboardApi",
-      "projectPath": "C:\\Users\\maksn\\Desktop\\DashboardForManager\\DashboardApi\\DashboardApi.csproj",
-      "packagesPath": "C:\\Users\\maksn\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\maksn\\Desktop\\DashboardForManager\\DashboardApi\\obj\\",
+      "projectPath": "G:\\WORK\\CURS\\Стажеры\\dash2\\DashboardApi\\DashboardApi.csproj",
+      "packagesPath": "C:\\Users\\Lenov\\.nuget\\packages\\",
+      "outputPath": "G:\\WORK\\CURS\\Стажеры\\dash2\\DashboardApi\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\maksn\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\Lenov\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -914,7 +909,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.200"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net9.0": {
@@ -952,7 +947,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

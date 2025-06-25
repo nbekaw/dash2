@@ -22,13 +22,33 @@ public class DashboardService : IDashboardService
         var statuses = await _requestStatuses.Find(_ => true).ToListAsync();
         var statusLookup = statuses.ToDictionary(s => s.Id, s => s.Code);
 
+        // Собираем все House IDs
+        var allHouseIds = houseGroups.SelectMany(hg => hg.Houses).ToHashSet();
+
+        // Загружаем все запросы сразу
+        var allRequests = await _requests
+            .Find(r => r.House != null && allHouseIds.Contains(r.House.ID))
+            .ToListAsync();
+
+        // Группируем по House ID
+        var requestsByHouseId = allRequests
+            .GroupBy(r => r.House.ID)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
         foreach (var hg in houseGroups)
         {
-            var requestFilter = Builders<Request>.Filter.In("House.ID", hg.Houses);
-            var requests = await _requests.Find(requestFilter).ToListAsync();
+            // Это лишний запрос в базу, для каждго ЖК будет делатся такой запрос, надо старатся минимизироват запросы в базу данных
+            // для этого лучше подгружать нужные данные заранее и группировать их
+            //var requestFilter = Builders<Request>.Filter.In("House.ID", hg.Houses);
+            //var requests = await _requests.Find(requestFilter).ToListAsync();
 
-            var assigned = requests.Count(r => statusLookup.ContainsKey(r.RequestStatusId) && statusLookup[r.RequestStatusId] == "executorAssigned");
-            var inProgress = requests.Count(r => statusLookup.ContainsKey(r.RequestStatusId) && statusLookup[r.RequestStatusId] == "work");
+            var groupRequests = hg.Houses
+                .Where(requestsByHouseId.ContainsKey)
+                .SelectMany(houseId => requestsByHouseId[houseId])
+                .ToList();
+
+            var assigned = groupRequests.Count(r => statusLookup.ContainsKey(r.RequestStatusId) && statusLookup[r.RequestStatusId] == "executorAssigned");
+            var inProgress = groupRequests.Count(r => statusLookup.ContainsKey(r.RequestStatusId) && statusLookup[r.RequestStatusId] == "work");
 
             result.Add(new RequestSummaryDto
             {
@@ -57,16 +77,34 @@ public class DashboardService : IDashboardService
         var tomorrow = today.AddDays(1);
         var afterTomorrow = today.AddDays(2);
 
+        var allHouseIds = houseGroups.SelectMany(hg => hg.Houses).ToHashSet();
+
+        // Загружаем все запросы
+        var allRequests = await _requests
+            .Find(r => r.House != null && allHouseIds.Contains(r.House.ID))
+            .ToListAsync();
+
+        // Группируем запросы по ID дома
+        var requestsByHouseId = allRequests
+            .GroupBy(r => r.House.ID)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
         foreach (var hg in houseGroups)
         {
-            var requests = await _requests.Find(r => r.House != null && hg.Houses.Contains(r.House.ID)).ToListAsync();
+            // тоже лишний запрос в базу данных
+            //var requests = await _requests.Find(r => r.House != null && hg.Houses.Contains(r.House.ID)).ToListAsync();
+
+            var groupRequests = hg.Houses
+                .Where(requestsByHouseId.ContainsKey)
+                .SelectMany(houseId => requestsByHouseId[houseId])
+                .ToList();
 
             var deadlines = new DeadlineGroup
             {
-                Today = CountByStatus(requests.Where(r => r.Deadline.HasValue && r.Deadline.Value.Date == today), statusLookup),
-                Tomorrow = CountByStatus(requests.Where(r => r.Deadline.HasValue && r.Deadline.Value.Date == tomorrow), statusLookup),
-                Overdue = CountByStatus(requests.Where(r => r.Deadline.HasValue && r.Deadline.Value < today), statusLookup),
-                MoreThan2Days = CountByStatus(requests.Where(r => r.Deadline.HasValue && r.Deadline.Value > afterTomorrow), statusLookup)            };
+                Today = CountByStatus(groupRequests.Where(r => r.Deadline.HasValue && r.Deadline.Value.Date == today), statusLookup),
+                Tomorrow = CountByStatus(groupRequests.Where(r => r.Deadline.HasValue && r.Deadline.Value.Date == tomorrow), statusLookup),
+                Overdue = CountByStatus(groupRequests.Where(r => r.Deadline.HasValue && r.Deadline.Value < today), statusLookup),
+                MoreThan2Days = CountByStatus(groupRequests.Where(r => r.Deadline.HasValue && r.Deadline.Value > afterTomorrow), statusLookup)            };
                 
             result.Add(new RequestDeadlineDto
             {
